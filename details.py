@@ -29,7 +29,6 @@ class Details:
           self.customer_state = customer["state"]
           self.customer_zip_code = customer["zip_code"]
         except KeyError as ke:
-            # raise ValueError("Error")
             raise ValueError(f"Missing customer {self.att(ke)}")
 
     def __set_invoice(self, data):
@@ -49,11 +48,7 @@ class Details:
 
     @classmethod
     def load(cls, file):
-        # try:
         return Details(Details.__data_from(file))
-
-    # except:
-    #   exit("Can't load details file")
 
     @classmethod
     def __data_from(cls, file_name):

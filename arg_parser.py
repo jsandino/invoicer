@@ -21,7 +21,6 @@ class ArgParser:
     if logo:
       try:
         file_type = magic.from_file(logo, mime=True)
-        print(f"File type: {file_type}")
         if file_type != "image/png" and file_type != "image/jpeg":
           print("Invalid image: expected a png or jpg", file=sys.stderr)
           sys.exit(2)
