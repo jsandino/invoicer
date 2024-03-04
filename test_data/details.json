@@ -1,0 +1,26 @@
+{
+  "company" : {
+    "name" : "Mario's Plumbing Co",
+    "street" : "Mario Bros. House",
+    "city" : "Toad Town",
+    "state" : "Mushroom Kingdom",
+    "zip_code" : 12345,
+    "phone" : "416-981-2455",
+    "email" : "mario@mariosplumbco.com"
+  },
+  "customer" : {
+    "name" : "Bowser",
+    "street": "Royal Dungeon",
+    "city" : "Bowser's Castle",
+    "state" : "Koopa Kingdom",
+    "zip_code" : 67890
+  },
+  "invoice" : {
+    "number" : 25,
+    "date" : "2024-03-04",
+    "period_start" : "2024-02-01",
+    "period_end" : "2024-02-29",
+    "description" : "Plumbing services",
+    "terms" : 15 
+  }
+}

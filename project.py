@@ -1,5 +1,6 @@
 import sys
 from arg_parser import ArgParser
+from details import Details
 
 
 def main():
@@ -18,6 +19,12 @@ def parse_args():
     element 3 -> path to a csv file containing all line items to be included in the invoice
     """
     return ArgParser().validate_input()
+
+def load_details(details_file):
+    """
+    Loads invoice details from a user supplied json file.
+    """
+    return Details.load(details_file)
 
 
 if __name__ == "__main__":
