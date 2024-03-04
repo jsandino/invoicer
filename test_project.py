@@ -1,5 +1,5 @@
 import json
-from project import parse_args, load_details
+from project import parse_args, load_details, create_invoice
 from details import Details
 import pytest
 import sys
@@ -144,29 +144,57 @@ def test_load_details():
 
 def test_details_missing_company_attributes(capsys):
     assert_missing_attribute(capsys, att="company.name", error="Missing company name")
-    assert_missing_attribute(capsys, att="company.street", error="Missing company street")
+    assert_missing_attribute(
+        capsys, att="company.street", error="Missing company street"
+    )
     assert_missing_attribute(capsys, att="company.city", error="Missing company city")
     assert_missing_attribute(capsys, att="company.state", error="Missing company state")
-    assert_missing_attribute(capsys, att="company.zip_code", error="Missing company zip code")
+    assert_missing_attribute(
+        capsys, att="company.zip_code", error="Missing company zip code"
+    )
     assert_missing_attribute(capsys, att="company.phone", error="Missing company phone")
     assert_missing_attribute(capsys, att="company.email", error="Missing company email")
 
 
 def test_details_missing_customer_attributes(capsys):
     assert_missing_attribute(capsys, att="customer.name", error="Missing customer name")
-    assert_missing_attribute(capsys, att="customer.street", error="Missing customer street")
+    assert_missing_attribute(
+        capsys, att="customer.street", error="Missing customer street"
+    )
     assert_missing_attribute(capsys, att="customer.city", error="Missing customer city")
-    assert_missing_attribute(capsys, att="customer.state", error="Missing customer state")
-    assert_missing_attribute(capsys, att="customer.zip_code", error="Missing customer zip code")
+    assert_missing_attribute(
+        capsys, att="customer.state", error="Missing customer state"
+    )
+    assert_missing_attribute(
+        capsys, att="customer.zip_code", error="Missing customer zip code"
+    )
 
 
 def test_details_missing_invoice_attributes(capsys):
-    assert_missing_attribute(capsys, att="invoice.number", error="Missing invoice number")
+    assert_missing_attribute(
+        capsys, att="invoice.number", error="Missing invoice number"
+    )
     assert_missing_attribute(capsys, att="invoice.date", error="Missing invoice date")
-    assert_missing_attribute(capsys, att="invoice.period_start", error="Missing invoice period start")
-    assert_missing_attribute(capsys, att="invoice.period_end", error="Missing invoice period end")
-    assert_missing_attribute(capsys, att="invoice.description", error="Missing invoice description")
+    assert_missing_attribute(
+        capsys, att="invoice.period_start", error="Missing invoice period start"
+    )
+    assert_missing_attribute(
+        capsys, att="invoice.period_end", error="Missing invoice period end"
+    )
+    assert_missing_attribute(
+        capsys, att="invoice.description", error="Missing invoice description"
+    )
     assert_missing_attribute(capsys, att="invoice.terms", error="Missing invoice terms")
+
+
+def test_create_invoice():
+    invoice = create_invoice(
+        "test_data/smp.png", "test_data/details.json", "test_data/items.csv"
+    )
+    assert "Mario's Plumbing Co" == invoice.issuer
+    assert "Mario Bros. House" == invoice.contact[0]
+    assert "Toad Town, Mushroom Kingdom, 12345" == invoice.contact[1]
+    assert "416-981-2455 \u2022 mario@mariosplumbco.com" == invoice.contact[2]
 
 
 def assert_missing_attribute(capsys, att, error):

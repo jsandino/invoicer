@@ -1,11 +1,14 @@
 import sys
 from arg_parser import ArgParser
 from details import Details
+from invoice import Invoice
 
 
 def main():
     try:
         logo, details, tasks = parse_args()
+        invoice = create_invoice(logo, details, tasks)
+        invoice.print()
     except Exception as e:
         sys.exit(e)
 
@@ -19,6 +22,14 @@ def parse_args():
     element 3 -> path to a csv file containing all line items to be included in the invoice
     """
     return ArgParser().validate_input()
+
+def create_invoice(logo_image, details_file, tasks_file):
+    """
+    Creates an invoice instance from the user supplied information.
+    """
+    details = load_details(details_file)
+    invoice: Invoice = Invoice(logo_image, details)
+    return invoice
 
 def load_details(details_file):
     """
