@@ -195,7 +195,11 @@ def test_create_invoice():
     assert "Mario Bros. House" == invoice.contact[0]
     assert "Toad Town, Mushroom Kingdom, 12345" == invoice.contact[1]
     assert "416-981-2455 \u2022 mario@mariosplumbco.com" == invoice.contact[2]
-
+    assert "Bowser" == invoice.customer[0]
+    assert "Royal Dungeon" == invoice.customer[1]
+    assert "Bowser's Castle, Koopa Kingdom, 67890" == invoice.customer[2]
+    assert "Invoice # 25" == str(invoice)
+    assert "March 04, 2024" == invoice.date
 
 def assert_missing_attribute(capsys, att, error):
     data = load_test_details(excluding=att)
