@@ -7,6 +7,7 @@ class Invoice(FPDF):
 
     def __init__(self, logo, details):
         super().__init__()
+        self.__add_fonts()
         self.__logo = logo
         self.__number = details.invoice_number
         self.__date = details.invoice_date
@@ -24,6 +25,14 @@ class Invoice(FPDF):
         self.__customer_city = details.customer_city
         self.__customer_state = details.customer_state
         self.__customer_zip = details.customer_zip_code
+
+
+    def __add_fonts(self):
+      self.add_font('Anta', '', 'fonts/Anta-Regular.ttf')
+      self.add_font('CourierPrime', '', 'fonts/CourierPrime-Regular.ttf')
+      self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf')
+      self.add_font('CourierPrimeItalic', 'I', 'fonts/CourierPrime-Italic.ttf')
+
 
     @property
     def issuer(self):
@@ -68,15 +77,17 @@ class Invoice(FPDF):
 
 
     def __str__(self):
+        return self.invoice_number
+    
+
+    @property
+    def invoice_number(self):
         return f"Invoice # {self.__number}"
+
 
     def header(self):
       self.add_logo()
       left_padding = self.left_margin
-
-      self.add_font('Anta', '', 'fonts/Anta-Regular.ttf', uni=True)
-      self.add_font('CourierPrime', '', 'fonts/CourierPrime-Regular.ttf', uni=True)
-      self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf', uni=True)
 
       self.set_font("Anta", "", 14)
       self.cell(left_padding) # move to the right
@@ -87,6 +98,14 @@ class Invoice(FPDF):
         self.ln(5)
         self.cell(left_padding) # move to the right
         self.cell(30, 10, contact_info)
+
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font("CourierPrimeItalic", "I", 8)
+        self.set_text_color(128)
+        self.cell(0, 10, self.invoice_number, align="L")
+        self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align="R")
 
 
     def add_logo(self):
@@ -126,7 +145,7 @@ class Invoice(FPDF):
 
         self.set_font("CourierPrimeBold", "B", 12)
         self.set_x(-45)
-        self.cell(30, top, str(self))
+        self.cell(30, top, self.invoice_number)
 
         self.set_font("CourierPrime", "", 10)
         x_pos = self.__right_margin(self.date)
