@@ -200,6 +200,9 @@ def test_create_invoice():
     assert "Bowser's Castle, Koopa Kingdom, 67890" == invoice.customer[2]
     assert "Invoice # 25" == str(invoice)
     assert "March 04, 2024" == invoice.date
+    assert "Plumbing services" == invoice.description
+    assert "Terms: 15 days net" == invoice.terms
+    assert "Please make funds payable to: Mario's Plumbing Co" == invoice.payable_to
 
 def assert_missing_attribute(capsys, att, error):
     data = load_test_details(excluding=att)

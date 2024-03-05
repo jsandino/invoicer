@@ -10,6 +10,8 @@ class Invoice(FPDF):
         self.__logo = logo
         self.__number = details.invoice_number
         self.__date = details.invoice_date
+        self.__description = details.invoice_description
+        self.__terms = details.invoice_terms
         self.__issuer = details.company_name
         self.__street = details.company_street
         self.__city = details.company_city
@@ -48,6 +50,23 @@ class Invoice(FPDF):
             self.__customer_street,
             f"{self.__customer_city}, {self.__customer_state}, {self.__customer_zip}"
         ]
+    
+    
+    @property
+    def description(self):
+        return self.__description
+    
+
+    @property
+    def terms(self):
+        return f"Terms: {self.__terms} days net"
+    
+
+    @property
+    def payable_to(self):
+        return f"Please make funds payable to: {self.__issuer}"
+
+
     def __str__(self):
         return f"Invoice # {self.__number}"
 
@@ -83,6 +102,7 @@ class Invoice(FPDF):
         self.add_top_panel()
         self.add_customer_info()
         self.add_invoice_info()
+        self.add_terms_info()
         self.output(f"invoice-{self.__number}.pdf")          
 
 
@@ -117,7 +137,13 @@ class Invoice(FPDF):
     def __right_margin(self, text):
         width = self.get_string_width(text)
         return 210 - width - 14.5
-    
+
+
+    def add_terms_info(self):
+        self.ln(Invoice.SECTION_SPACING)
+        self.cell(30, 10, self.payable_to)
+        self.ln(5)
+        self.cell(30, 10, self.terms)
             
 
       
