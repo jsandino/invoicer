@@ -3,6 +3,8 @@ from fpdf import FPDF
 
 
 class Invoice(FPDF):
+    SECTION_SPACING = 20
+
     def __init__(self, logo, details):
         super().__init__()
         self.__logo = logo
@@ -46,8 +48,6 @@ class Invoice(FPDF):
             self.__customer_street,
             f"{self.__customer_city}, {self.__customer_state}, {self.__customer_zip}"
         ]
-    
-    
     def __str__(self):
         return f"Invoice # {self.__number}"
 
@@ -56,13 +56,14 @@ class Invoice(FPDF):
       left_padding = self.left_margin
 
       self.add_font('Anta', '', 'fonts/Anta-Regular.ttf', uni=True)
-      self.add_font('Courier', '', 'fonts/CourierPrime-Regular.ttf', uni=True)
+      self.add_font('CourierPrime', '', 'fonts/CourierPrime-Regular.ttf', uni=True)
+      self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf', uni=True)
 
       self.set_font("Anta", "", 14)
       self.cell(left_padding) # move to the right
       self.cell(30, 10, self.issuer)
 
-      self.set_font("Courier", "", 10)
+      self.set_font("CourierPrime", "", 10)
       for contact_info in self.contact:
         self.ln(5)
         self.cell(left_padding) # move to the right
@@ -86,7 +87,7 @@ class Invoice(FPDF):
 
 
     def add_top_panel(self):
-        self.ln(15)
+        self.ln(Invoice.SECTION_SPACING)
         self.set_draw_color(0, 0, 0)
         self.set_line_width(0.2)
         self.cell(0, 25, "", 1, 1, '')                
@@ -103,11 +104,11 @@ class Invoice(FPDF):
     def add_invoice_info(self):
         top = -40
 
-        self.set_font("Courier", "B", 12)
+        self.set_font("CourierPrimeBold", "B", 12)
         self.set_x(-45)
         self.cell(30, top, str(self))
 
-        self.set_font("Courier", "", 10)
+        self.set_font("CourierPrime", "", 10)
         x_pos = self.__right_margin(self.date)
         self.set_x(x_pos)
         self.cell(30, top + 12, self.date)
@@ -116,7 +117,7 @@ class Invoice(FPDF):
     def __right_margin(self, text):
         width = self.get_string_width(text)
         return 210 - width - 14.5
-        
+    
             
 
       
