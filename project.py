@@ -2,12 +2,13 @@ import sys
 from arg_parser import ArgParser
 from details import Details
 from invoice import Invoice
+from item import Item
 
 
 def main():
     try:
-        logo, details, tasks = parse_args()
-        invoice = create_invoice(logo, details, tasks)
+        logo, details, items = parse_args()
+        invoice = create_invoice(logo, details, items)
         invoice.print()
     except Exception as e:
         sys.exit(e)
@@ -23,12 +24,13 @@ def parse_args():
     """
     return ArgParser().validate_input()
 
-def create_invoice(logo_image, details_file, tasks_file):
+def create_invoice(logo_image, details_file, items_file):
     """
     Creates an invoice instance from the user supplied information.
     """
     details = load_details(details_file)
-    invoice: Invoice = Invoice(logo_image, details)
+    items = load_items(items_file)
+    invoice: Invoice = Invoice(logo_image, details, items)
     return invoice
 
 def load_details(details_file):
@@ -36,6 +38,12 @@ def load_details(details_file):
     Loads invoice details from a user supplied json file.
     """
     return Details.load(details_file)
+
+def load_items(items_file):
+    """
+    Loads line items from a user supplied csv file.
+    """
+    return Item.load_all(items_file)
 
 
 if __name__ == "__main__":

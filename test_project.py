@@ -1,5 +1,7 @@
+import csv
 import json
-from project import parse_args, load_details, create_invoice
+from item import Item
+from project import load_items, parse_args, load_details, create_invoice
 from details import Details
 import pytest
 import sys
@@ -143,49 +145,89 @@ def test_load_details():
 
 
 def test_details_missing_company_attributes(capsys):
-    assert_missing_attribute(capsys, att="company.name", error="Missing company name")
-    assert_missing_attribute(
+    assert_missing_details(capsys, att="company.name", error="Missing company name")
+    assert_missing_details(
         capsys, att="company.street", error="Missing company street"
     )
-    assert_missing_attribute(capsys, att="company.city", error="Missing company city")
-    assert_missing_attribute(capsys, att="company.state", error="Missing company state")
-    assert_missing_attribute(
+    assert_missing_details(capsys, att="company.city", error="Missing company city")
+    assert_missing_details(capsys, att="company.state", error="Missing company state")
+    assert_missing_details(
         capsys, att="company.zip_code", error="Missing company zip code"
     )
-    assert_missing_attribute(capsys, att="company.phone", error="Missing company phone")
-    assert_missing_attribute(capsys, att="company.email", error="Missing company email")
+    assert_missing_details(capsys, att="company.phone", error="Missing company phone")
+    assert_missing_details(capsys, att="company.email", error="Missing company email")
 
 
 def test_details_missing_customer_attributes(capsys):
-    assert_missing_attribute(capsys, att="customer.name", error="Missing customer name")
-    assert_missing_attribute(
+    assert_missing_details(capsys, att="customer.name", error="Missing customer name")
+    assert_missing_details(
         capsys, att="customer.street", error="Missing customer street"
     )
-    assert_missing_attribute(capsys, att="customer.city", error="Missing customer city")
-    assert_missing_attribute(
+    assert_missing_details(capsys, att="customer.city", error="Missing customer city")
+    assert_missing_details(
         capsys, att="customer.state", error="Missing customer state"
     )
-    assert_missing_attribute(
+    assert_missing_details(
         capsys, att="customer.zip_code", error="Missing customer zip code"
     )
 
 
 def test_details_missing_invoice_attributes(capsys):
-    assert_missing_attribute(
+    assert_missing_details(
         capsys, att="invoice.number", error="Missing invoice number"
     )
-    assert_missing_attribute(capsys, att="invoice.date", error="Missing invoice date")
-    assert_missing_attribute(
+    assert_missing_details(capsys, att="invoice.date", error="Missing invoice date")
+    assert_missing_details(
         capsys, att="invoice.period_start", error="Missing invoice period start"
     )
-    assert_missing_attribute(
+    assert_missing_details(
         capsys, att="invoice.period_end", error="Missing invoice period end"
     )
-    assert_missing_attribute(
+    assert_missing_details(
         capsys, att="invoice.description", error="Missing invoice description"
     )
-    assert_missing_attribute(capsys, att="invoice.terms", error="Missing invoice terms")
+    assert_missing_details(capsys, att="invoice.terms", error="Missing invoice terms")
 
+
+def test_load_items():
+    items = load_items("test_data/items.csv")
+    assert len(items) == 5
+    assert "Feb 05, 2024" == items[1].date
+    assert 3.0 == items[1].hours
+    assert "Tested pipeline fixes, looked for leaks" == items[1].description
+
+
+def test_item_missing_date(capsys):
+    assert_incomplete_item(capsys, att="Date", error="Missing item date")
+
+
+def test_item_with_invalid_date():
+    with pytest.raises(ValueError) as pytest_error:
+        Item({"Date" : "bad"})
+
+    assert pytest_error.value.args[0] == "Invalid item date 'bad'"    
+
+
+def test_item_missing_hours(capsys):
+    assert_incomplete_item(capsys, att="Hours", error="Missing item hours")
+
+
+def test_item_with_invalid_hours():
+    with pytest.raises(ValueError) as pytest_error:
+        Item({"Date" : "2024-02-01", "Hours": "five"})
+
+    assert pytest_error.value.args[0] == "Invalid number of hours: 'five'"    
+
+
+def test_item_missing_description(capsys):
+    assert_incomplete_item(capsys, att="Description", error="Missing item description")
+
+
+def test_item_with_empty_description():
+    with pytest.raises(ValueError) as pytest_error:
+        Item({"Date" : "2024-02-01", "Hours": "5", "Description": "" })
+
+    assert pytest_error.value.args[0] == "Missing item description"
 
 def test_create_invoice():
     invoice = create_invoice(
@@ -203,8 +245,13 @@ def test_create_invoice():
     assert "Plumbing services" == invoice.description
     assert "Terms: 15 days net" == invoice.terms
     assert "Please make funds payable to: Mario's Plumbing Co" == invoice.payable_to
+    assert 5 == len(invoice)
+    assert "Feb 13, 2024" == invoice.items[3].date
+    assert 3.5 == invoice.items[3].hours
+    assert "Replaced faucet on Kamek's workshop" == invoice.items[3].description
 
-def assert_missing_attribute(capsys, att, error):
+
+def assert_missing_details(capsys, att, error):
     data = load_test_details(excluding=att)
     # with capsys.disabled():
     #     print(f"\n{data}")
@@ -221,5 +268,26 @@ def load_test_details(excluding):
     atts = excluding.split(".")
     if len(atts) == 2:
         del data[atts[0]][atts[1]]
+
+    return data
+
+
+def assert_incomplete_item(capsys, att, error):
+    data = load_test_items(excluding=att)
+    # with capsys.disabled():
+    #     print(f"\n{data}")    
+    with pytest.raises(ValueError) as pytest_error:
+        Item(data[0])
+
+    assert pytest_error.value.args[0] == error
+
+
+def load_test_items(excluding=""):
+    data = []
+    with open("test_data/items.csv") as file:
+        reader = csv.DictReader(file)
+        for row in reader:
+            del row[excluding]
+            data.append(row)
 
     return data

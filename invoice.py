@@ -5,10 +5,11 @@ from fpdf import FPDF
 class Invoice(FPDF):
     SECTION_SPACING = 20
 
-    def __init__(self, logo, details):
+    def __init__(self, logo, details, items):
         super().__init__()
         self.__add_fonts()
         self.__logo = logo
+        self.__items = items
         self.__number = details.invoice_number
         self.__date = details.invoice_date
         self.__description = details.invoice_description
@@ -33,6 +34,15 @@ class Invoice(FPDF):
       self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf')
       self.add_font('CourierPrimeItalic', 'I', 'fonts/CourierPrime-Italic.ttf')
 
+
+    def __len__(self):
+        return len(self.items)
+
+
+    @property
+    def items(self):
+        return self.__items
+    
 
     @property
     def issuer(self):
