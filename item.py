@@ -54,6 +54,10 @@ class Item:
     return self.__description
 
 
+  @property
+  def data(self):
+    return [self.date, f"{self.hours}", self.description]
+
   @classmethod
   def load_all(cls, file):
     return [Item(i) for i in Item.__items_from(file)]

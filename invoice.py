@@ -1,5 +1,6 @@
 from datetime import date
-from fpdf import FPDF
+from fpdf import FPDF, FontFace
+from fpdf.enums import TableCellFillMode
 
 
 class Invoice(FPDF):
@@ -31,6 +32,7 @@ class Invoice(FPDF):
     def __add_fonts(self):
       self.add_font('Anta', '', 'fonts/Anta-Regular.ttf')
       self.add_font('CourierPrime', '', 'fonts/CourierPrime-Regular.ttf')
+      self.add_font('CourierPrime', 'B', 'fonts/CourierPrime-Regular.ttf')
       self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf')
       self.add_font('CourierPrimeItalic', 'I', 'fonts/CourierPrime-Italic.ttf')
 
@@ -53,6 +55,7 @@ class Invoice(FPDF):
     def date(self):
         invoice_date = date.fromisoformat(self.__date)
         return invoice_date.strftime("%B %d, %Y")
+
 
     @property
     def contact(self):
@@ -132,7 +135,12 @@ class Invoice(FPDF):
         self.add_customer_info()
         self.add_invoice_info()
         self.add_terms_info()
-        self.output(f"invoice-{self.__number}.pdf")          
+
+        self.add_page()
+        self.add_description()
+        self.add_items()
+
+        self.output(f"invoice-{self.__number}.pdf")                  
 
 
     def add_top_panel(self):
@@ -173,6 +181,38 @@ class Invoice(FPDF):
         self.cell(30, 10, self.payable_to)
         self.ln(5)
         self.cell(30, 10, self.terms)
+
+
+    def add_description(self):
+        self.ln(Invoice.SECTION_SPACING)
+        self.set_font("CourierPrimeBold", "B", 12)
+        self.cell(30, 10, self.description)
+                        
+
+    def add_items(self):
+        self.ln(Invoice.SECTION_SPACING - 5)
+        self.set_draw_color(150, 150, 150)
+        self.set_line_width(0.3)
+        headings_style = FontFace(fill_color=(220, 220, 220))
+        with self.table(
+            borders_layout="NO_HORIZONTAL_LINES",
+            cell_fill_color=(232, 251, 255),
+            cell_fill_mode=TableCellFillMode.ROWS,
+            col_widths=(25, 15, 90),
+            headings_style=headings_style,
+            line_height=6,
+            text_align=("LEFT", "LEFT", "LEFT"),
+            width=190,
+        ) as table:
+            self.set_font("CourierPrimeBold", "B", 10)
+            table.row(cells=["Date", "Hours", "Description"])
+
+            self.set_font("CourierPrime", "", 9)
+            for item in self.items:
+                row = table.row()
+                for datum in item.data:
+                    row.cell(datum, padding=[0, 0, 0, 3])
+
             
 
       
