@@ -120,7 +120,7 @@ class Invoice(FPDF):
       self.cell(left_padding) # move to the right
       self.cell(30, 10, self.issuer)
 
-      self.set_font("CourierPrime", "", 10)
+      self.set_font("CourierPrime", "", 9)
       for contact_info in self.contact:
         self.ln(5)
         self.cell(left_padding) # move to the right
@@ -137,11 +137,11 @@ class Invoice(FPDF):
 
     def add_logo(self):
         if self.__logo:
-          self.image(self.__logo, x=10, y=11, w=15)
+          self.image(self.__logo, x=6, y=10, w=15)
 
     @property
     def left_margin(self):
-        return 20 if self.__logo else 2
+        return 15 if self.__logo else 2
 
     def print(self):
         self.add_page()
@@ -210,7 +210,7 @@ class Invoice(FPDF):
 
 
     def add_description(self):
-        self.ln(Invoice.SECTION_SPACING)
+        self.ln(5)
         self.set_font("CourierPrimeBold", "B", 12)
         self.cell(30, 10, self.description)
                         
