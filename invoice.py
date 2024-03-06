@@ -144,6 +144,12 @@ class Invoice(FPDF):
             self.cell(left_padding)  # move to the right
             self.cell(30, 10, contact_info)
 
+        self.__set_content_top_margin()
+
+    def __set_content_top_margin(self):
+        top_margin = Invoice.SECTION_SPACING if self.page_no() < 3 else 40
+        self.set_y(top_margin)
+
     def footer(self):
         self.set_y(-15)
         self.set_font("CourierPrimeItalic", "I", 8)
@@ -217,13 +223,13 @@ class Invoice(FPDF):
             line_height=10,
             text_align=("CENTER", "CENTER", "CENTER", "RIGHT"),
             width=190,
-            padding = [0, 1, 0, 0]
+            padding=[0, 1, 0, 0],
         ) as table:
             for data_row in self.summary_data:
                 row = table.row()
                 for datum in data_row:
                     row.cell(datum)
-            
+
             self.set_font("CourierPrimeBold", "B", 11)
             row = table.row()
             row.cell("")
@@ -244,7 +250,7 @@ class Invoice(FPDF):
             ["", "", "", ""],
             ["", "", "", ""],
             ["", "", "Subtotal:", f"${self.total_cost:6,.2f}"],
-            ["", "", self.tax_label, f"${self.tax_amount:6,.2f}"]
+            ["", "", self.tax_label, f"${self.tax_amount:6,.2f}"],
         ]
 
     def add_terms_info(self):
