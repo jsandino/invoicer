@@ -249,6 +249,8 @@ def test_create_invoice():
     assert "Feb 13, 2024" == invoice.items[3].date
     assert 3.5 == invoice.items[3].hours
     assert "Replaced faucet on Kamek's workshop" == invoice.items[3].description
+    assert "From: February 01, 2024" == invoice.period_start
+    assert "To: February 29, 2024" == invoice.period_end
 
 
 def assert_missing_details(capsys, att, error):

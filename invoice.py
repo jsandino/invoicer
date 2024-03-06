@@ -27,6 +27,8 @@ class Invoice(FPDF):
         self.__customer_city = details.customer_city
         self.__customer_state = details.customer_state
         self.__customer_zip = details.customer_zip_code
+        self.__period_start = details.invoice_period_start
+        self.__period_end = details.invoice_period_end
 
 
     def __add_fonts(self):
@@ -89,6 +91,18 @@ class Invoice(FPDF):
         return f"Please make funds payable to: {self.__issuer}"
 
 
+    @property
+    def period_start(self):
+        start_date = date.fromisoformat(self.__period_start)
+        return f"From: {start_date.strftime('%B %d, %Y')}"
+    
+
+    @property
+    def period_end(self):
+        end_date = date.fromisoformat(self.__period_end)
+        return f"To: {end_date.strftime('%B %d, %Y')}"
+
+    
     def __str__(self):
         return self.invoice_number
     
@@ -137,6 +151,7 @@ class Invoice(FPDF):
         self.add_terms_info()
 
         self.add_page()
+        self.add_timesheet_period()
         self.add_description()
         self.add_items()
 
@@ -181,6 +196,17 @@ class Invoice(FPDF):
         self.cell(30, 10, self.payable_to)
         self.ln(5)
         self.cell(30, 10, self.terms)
+
+
+    def add_timesheet_period(self):
+        self.set_font("CourierPrimeBold", "B", 10)
+        self.cell(0, -25, "Detailed Timesheet", align="R")
+        self.ln(10)
+        
+        self.set_font("CourierPrime", "", 9)
+        self.cell(0, -25, self.period_start, align="R")
+        self.ln(5)
+        self.cell(0, -25, self.period_end, align="R")
 
 
     def add_description(self):
