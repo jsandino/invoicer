@@ -24,6 +24,7 @@ def parse_args():
     """
     return ArgParser().validate_input()
 
+
 def create_invoice(logo_image, details_file, items_file):
     """
     Creates an invoice instance from the user supplied information.
@@ -33,11 +34,13 @@ def create_invoice(logo_image, details_file, items_file):
     invoice: Invoice = Invoice(logo_image, details, items)
     return invoice
 
+
 def load_details(details_file):
     """
     Loads invoice details from a user supplied json file.
     """
     return Details.load(details_file)
+
 
 def load_items(items_file):
     """

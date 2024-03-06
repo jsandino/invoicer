@@ -32,34 +32,28 @@ class Invoice(FPDF):
         self.__period_end = details.invoice_period_end
         self.__unit_cost = details.invoice_unit_cost
 
-
     def __add_fonts(self):
-      self.add_font('Anta', '', 'fonts/Anta-Regular.ttf')
-      self.add_font('CourierPrime', '', 'fonts/CourierPrime-Regular.ttf')
-      self.add_font('CourierPrime', 'B', 'fonts/CourierPrime-Regular.ttf')
-      self.add_font('CourierPrimeBold', 'B', 'fonts/CourierPrime-Bold.ttf')
-      self.add_font('CourierPrimeItalic', 'I', 'fonts/CourierPrime-Italic.ttf')
-
+        self.add_font("Anta", "", "fonts/Anta-Regular.ttf")
+        self.add_font("CourierPrime", "", "fonts/CourierPrime-Regular.ttf")
+        self.add_font("CourierPrime", "B", "fonts/CourierPrime-Regular.ttf")
+        self.add_font("CourierPrimeBold", "B", "fonts/CourierPrime-Bold.ttf")
+        self.add_font("CourierPrimeItalic", "I", "fonts/CourierPrime-Italic.ttf")
 
     def __len__(self):
         return len(self.items)
 
-
     @property
     def items(self):
         return self.__items
-    
 
     @property
     def issuer(self):
         return self.__issuer
-    
 
     @property
     def date(self):
         invoice_date = date.fromisoformat(self.__date)
         return invoice_date.strftime("%B %d, %Y")
-
 
     @property
     def contact(self):
@@ -68,80 +62,69 @@ class Invoice(FPDF):
             f"{self.__city}, {self.__state}, {self.__zip}",
             f"{self.__phone} \u2022 {self.__email}",
         ]
-    
+
     @property
     def customer(self):
         return [
             self.__customer,
             self.__customer_street,
-            f"{self.__customer_city}, {self.__customer_state}, {self.__customer_zip}"
+            f"{self.__customer_city}, {self.__customer_state}, {self.__customer_zip}",
         ]
-    
-    
+
     @property
     def description(self):
         return self.__description
-    
 
     @property
     def terms(self):
         return f"Terms: {self.__terms} days net"
-    
 
     @property
     def payable_to(self):
         return f"Please make funds payable to: {self.__issuer}"
 
-
     @property
     def period_start(self):
         start_date = date.fromisoformat(self.__period_start)
         return f"From: {start_date.strftime('%B %d, %Y')}"
-    
 
     @property
     def period_end(self):
         end_date = date.fromisoformat(self.__period_end)
         return f"To: {end_date.strftime('%B %d, %Y')}"
 
-
     @property
     def total_hours(self):
         return functools.reduce(lambda total, item: total + item.hours, self.__items, 0)
-    
 
     def __str__(self):
         return self.invoice_number
-    
 
     @property
     def invoice_number(self):
         return f"Invoice # {self.__number}"
-    
 
     @property
     def unit_cost(self):
         return self.__unit_cost
-
 
     @property
     def total_cost(self):
         return self.total_hours * self.unit_cost
 
     def header(self):
-      self.add_logo()
-      left_padding = self.left_margin
+        self.add_logo()
+        left_padding = self.left_margin
 
-      self.set_font("Anta", "", 14)
-      self.cell(left_padding) # move to the right
-      self.cell(30, 10, self.issuer)
+        self.set_font("Anta", "", 14)
+        self.cell(left_padding)  # move to the right
+        self.cell(30, 10, self.issuer)
 
-      self.set_font("CourierPrime", "", 9)
-      for contact_info in self.contact:
-        self.ln(5)
-        self.cell(left_padding) # move to the right
-        self.cell(30, 10, contact_info)
-
+        self.set_font("CourierPrime", "", 9)
+        for contact_info in self.contact:
+            self.ln(5)
+            self.cell(left_padding)  # move to the right
+            self.cell(30, 10, contact_info)
 
     def footer(self):
         self.set_y(-15)
@@ -150,10 +133,9 @@ class Invoice(FPDF):
         self.cell(0, 10, self.invoice_number, align="L")
         self.cell(0, 10, f"Page {self.page_no()} of {{nb}}", align="R")
 
-
     def add_logo(self):
         if self.__logo:
-          self.image(self.__logo, x=6, y=10, w=15)
+            self.image(self.__logo, x=6, y=10, w=15)
 
     @property
     def left_margin(self):
@@ -172,23 +154,20 @@ class Invoice(FPDF):
         self.add_description()
         self.add_items()
 
-        self.output(f"invoice-{self.__number}.pdf")                  
-
+        self.output(f"invoice-{self.__number}.pdf")
 
     def add_top_panel(self):
         self.ln(Invoice.SECTION_SPACING)
         self.set_draw_color(0, 0, 0)
         self.set_line_width(0.2)
-        self.cell(0, 25, "", 1, 1, '')                
-
+        self.cell(0, 25, "", 1, 1, "")
 
     def add_customer_info(self):
         top = -40
         for i, customer_info in enumerate(self.customer):
             offset = 10 * i
-            self.set_x(12)      
+            self.set_x(12)
             self.cell(10, top + offset, customer_info)
-
 
     def add_invoice_info(self):
         top = -40
@@ -202,11 +181,9 @@ class Invoice(FPDF):
         self.set_x(x_pos)
         self.cell(30, top + 12, self.date)
 
-
     def __right_margin(self, text):
         width = self.get_string_width(text)
         return 210 - width - 14.5
-
 
     def add_summary(self):
         self.ln(Invoice.SECTION_SPACING)
@@ -227,12 +204,17 @@ class Invoice(FPDF):
                 row = table.row()
                 for datum in data_row:
                     row.cell(datum)
-        
-    @property   
+
+    @property
     def summary_data(self):
         return [
             ["Description", "Hours", "Unit Cost", "Amount"],
-            [self.description, f"{self.total_hours}", f"${self.unit_cost:6,.2f} / hr.", f"${self.total_cost:6,.2f}"]
+            [
+                self.description,
+                f"{self.total_hours}",
+                f"${self.unit_cost:6,.2f} / hr.",
+                f"${self.total_cost:6,.2f}",
+            ],
         ]
 
     def add_terms_info(self):
@@ -241,23 +223,20 @@ class Invoice(FPDF):
         self.ln(5)
         self.cell(30, 10, self.terms)
 
-
     def add_timesheet_period(self):
         self.set_font("CourierPrimeBold", "B", 10)
         self.cell(0, -25, "Detailed Timesheet", align="R")
         self.ln(10)
-        
+
         self.set_font("CourierPrime", "", 9)
         self.cell(0, -25, self.period_start, align="R")
         self.ln(5)
         self.cell(0, -25, self.period_end, align="R")
 
-
     def add_description(self):
         self.ln(5)
         self.set_font("CourierPrimeBold", "B", 12)
         self.cell(30, 10, self.description)
-                        
 
     def add_items(self):
         self.ln(Invoice.SECTION_SPACING - 5)
@@ -287,8 +266,4 @@ class Invoice(FPDF):
             row = table.row()
             row.cell("Total Hours:", padding=[0, 0, 0, 3])
             row.cell(f"{self.total_hours}", padding=[0, 0, 0, 3])
-            row.cell("")                               
-
-            
-
-      
+            row.cell("")
