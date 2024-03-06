@@ -31,6 +31,8 @@ class Invoice(FPDF):
         self.__period_start = details.invoice_period_start
         self.__period_end = details.invoice_period_end
         self.__unit_cost = details.invoice_unit_cost
+        self.__tax_label = details.invoice_tax_label
+        self.__tax_rate = details.invoice_tax_rate
 
     def __add_fonts(self):
         self.add_font("Anta", "", "fonts/Anta-Regular.ttf")
@@ -111,6 +113,22 @@ class Invoice(FPDF):
     @property
     def total_cost(self):
         return self.total_hours * self.unit_cost
+
+    @property
+    def tax_label(self):
+        return f"{self.__tax_label}:"
+
+    @property
+    def tax_rate(self):
+        return self.__tax_rate
+
+    @property
+    def tax_amount(self):
+        return round(self.total_cost * self.tax_rate, 2)
+
+    @property
+    def amount_due(self):
+        return round(self.total_cost + self.tax_amount, 2)
 
     def header(self):
         self.add_logo()
@@ -197,13 +215,21 @@ class Invoice(FPDF):
             col_widths=(60, 15, 30, 30),
             headings_style=headings_style,
             line_height=10,
-            text_align=("CENTER", "CENTER", "CENTER", "CENTER"),
+            text_align=("CENTER", "CENTER", "CENTER", "RIGHT"),
             width=190,
+            padding = [0, 1, 0, 0]
         ) as table:
             for data_row in self.summary_data:
                 row = table.row()
                 for datum in data_row:
                     row.cell(datum)
+            
+            self.set_font("CourierPrimeBold", "B", 11)
+            row = table.row()
+            row.cell("")
+            row.cell("")
+            row.cell("Total :", padding=[0, 1, 0, 6])
+            row.cell(f"${self.amount_due:6,.2f}")
 
     @property
     def summary_data(self):
@@ -215,9 +241,14 @@ class Invoice(FPDF):
                 f"${self.unit_cost:6,.2f} / hr.",
                 f"${self.total_cost:6,.2f}",
             ],
+            ["", "", "", ""],
+            ["", "", "", ""],
+            ["", "", "Subtotal:", f"${self.total_cost:6,.2f}"],
+            ["", "", self.tax_label, f"${self.tax_amount:6,.2f}"]
         ]
 
     def add_terms_info(self):
+        self.set_font("CourierPrime", "", 10)
         self.ln(Invoice.SECTION_SPACING)
         self.cell(30, 10, self.payable_to)
         self.ln(5)

@@ -22,6 +22,8 @@
     "period_end" : "2024-02-29",
     "description" : "Plumbing services",
     "unit_cost" : 100,
-    "terms" : 15 
+    "terms" : 15,
+    "tax_label" : "Sales Tax",
+    "tax_rate" : 0.13
   }
 }

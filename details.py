@@ -40,6 +40,8 @@ class Details:
             self.invoice_period_end = invoice["period_end"]
             self.invoice_description = invoice["description"]
             self.invoice_terms = invoice["terms"]
+            self.invoice_tax_label = invoice.get("tax_label")
+            self.invoice_tax_rate = invoice.get("tax_rate")
             self.__set_unit_cost(invoice)
         except KeyError as ke:
             raise ValueError(f"Missing invoice {self.att(ke)}")

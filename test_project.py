@@ -152,6 +152,8 @@ def test_load_details():
     assert details.invoice_description == "Plumbing services"
     assert details.invoice_terms == 15
     assert details.invoice_unit_cost == 100.0
+    assert details.invoice_tax_label == "Sales Tax"
+    assert details.invoice_tax_rate == 0.13
 
 
 def test_details_missing_company_attributes(capsys):
@@ -203,6 +205,16 @@ def test_details_with_invalid_unit_cost(capsys):
         Details(details)
 
     assert pytest_error.value.args[0] == "Invalid unit cost: 'one-hundred'"
+
+
+def test_details_with_missing_tax_label():
+    details = load_test_details(excluding="invoice.tax_label")
+    assert Details(details).invoice_tax_label == None
+
+
+def test_details_with_missing_tax_rate():
+    details = load_test_details(excluding="invoice.tax_rate")
+    assert Details(details).invoice_tax_rate == None
 
 
 """
@@ -281,6 +293,10 @@ def test_create_invoice():
     assert invoice.total_hours == 21
     assert invoice.unit_cost == 100.0
     assert invoice.total_cost == 2100.0
+    assert invoice.tax_label == "Sales Tax:"
+    assert invoice.tax_rate == 0.13
+    assert invoice.tax_amount == 273.0
+    assert invoice.amount_due == 2373.0
 
 
 def assert_missing_details(capsys, att, error):
