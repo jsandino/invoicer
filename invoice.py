@@ -1,6 +1,7 @@
 from datetime import date
 from fpdf import FPDF, FontFace
 from fpdf.enums import TableCellFillMode
+import functools
 
 
 class Invoice(FPDF):
@@ -102,7 +103,12 @@ class Invoice(FPDF):
         end_date = date.fromisoformat(self.__period_end)
         return f"To: {end_date.strftime('%B %d, %Y')}"
 
+
+    @property
+    def total_hours(self):
+        return functools.reduce(lambda total, item: total + item.hours, self.__items, 0)
     
+
     def __str__(self):
         return self.invoice_number
     
@@ -238,6 +244,12 @@ class Invoice(FPDF):
                 row = table.row()
                 for datum in item.data:
                     row.cell(datum, padding=[0, 0, 0, 3])
+
+            self.set_font("CourierPrimeBold", "B", 9)
+            row = table.row()
+            row.cell("Total Hours:", padding=[0, 0, 0, 3])
+            row.cell(f"{self.total_hours}", padding=[0, 0, 0, 3])
+            row.cell("")                               
 
             
 
