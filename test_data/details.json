@@ -21,6 +21,7 @@
     "period_start" : "2024-02-01",
     "period_end" : "2024-02-29",
     "description" : "Plumbing services",
+    "unit_cost" : 100,
     "terms" : 15 
   }
 }

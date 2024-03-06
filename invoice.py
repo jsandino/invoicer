@@ -30,6 +30,7 @@ class Invoice(FPDF):
         self.__customer_zip = details.customer_zip_code
         self.__period_start = details.invoice_period_start
         self.__period_end = details.invoice_period_end
+        self.__unit_cost = details.invoice_unit_cost
 
 
     def __add_fonts(self):
@@ -116,7 +117,16 @@ class Invoice(FPDF):
     @property
     def invoice_number(self):
         return f"Invoice # {self.__number}"
+    
 
+    @property
+    def unit_cost(self):
+        return self.__unit_cost
+
+
+    @property
+    def total_cost(self):
+        return self.total_hours * self.unit_cost
 
     def header(self):
       self.add_logo()
@@ -154,6 +164,7 @@ class Invoice(FPDF):
         self.add_top_panel()
         self.add_customer_info()
         self.add_invoice_info()
+        self.add_summary()
         self.add_terms_info()
 
         self.add_page()
@@ -196,6 +207,33 @@ class Invoice(FPDF):
         width = self.get_string_width(text)
         return 210 - width - 14.5
 
+
+    def add_summary(self):
+        self.ln(Invoice.SECTION_SPACING)
+        self.set_draw_color(150, 150, 150)
+        self.set_line_width(0.3)
+        headings_style = FontFace(emphasis="", color=0)
+        with self.table(
+            borders_layout="NO_HORIZONTAL_LINES",
+            cell_fill_color=(232, 251, 255),
+            cell_fill_mode=TableCellFillMode.ROWS,
+            col_widths=(60, 15, 30, 30),
+            headings_style=headings_style,
+            line_height=10,
+            text_align=("CENTER", "CENTER", "CENTER", "CENTER"),
+            width=190,
+        ) as table:
+            for data_row in self.summary_data:
+                row = table.row()
+                for datum in data_row:
+                    row.cell(datum)
+        
+    @property   
+    def summary_data(self):
+        return [
+            ["Description", "Hours", "Unit Cost", "Amount"],
+            [self.description, f"{self.total_hours}", f"${self.unit_cost:6,.2f} / hr.", f"${self.total_cost:6,.2f}"]
+        ]
 
     def add_terms_info(self):
         self.ln(Invoice.SECTION_SPACING)

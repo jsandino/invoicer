@@ -142,6 +142,7 @@ def test_load_details():
     assert details.invoice_period_end == "2024-02-29"
     assert details.invoice_description == "Plumbing services"
     assert details.invoice_terms == 15
+    assert details.invoice_unit_cost == 100.0
 
 
 def test_details_missing_company_attributes(capsys):
@@ -187,7 +188,16 @@ def test_details_missing_invoice_attributes(capsys):
         capsys, att="invoice.description", error="Missing invoice description"
     )
     assert_missing_details(capsys, att="invoice.terms", error="Missing invoice terms")
+    assert_missing_details(capsys, att="invoice.unit_cost", error="Missing invoice unit cost")
 
+
+def test_details_with_invalid_unit_cost(capsys):
+    details = load_test_details("")
+    details["invoice"]["unit_cost"] = "one-hundred"
+    with pytest.raises(ValueError) as pytest_error:
+        Details(details)
+
+    assert pytest_error.value.args[0] == "Invalid unit cost: 'one-hundred'"    
 
 def test_load_items():
     items = load_items("test_data/items.csv")
@@ -252,7 +262,8 @@ def test_create_invoice():
     assert "From: February 01, 2024" == invoice.period_start
     assert "To: February 29, 2024" == invoice.period_end
     assert 21 == invoice.total_hours
-
+    assert 100.0 == invoice.unit_cost
+    assert 2,100.00 == invoice.total_cost
 
 def assert_missing_details(capsys, att, error):
     data = load_test_details(excluding=att)

@@ -40,8 +40,15 @@ class Details:
           self.invoice_period_end = invoice["period_end"]
           self.invoice_description = invoice["description"]
           self.invoice_terms = invoice["terms"]
+          self.__set_unit_cost(invoice)
         except KeyError as ke:
             raise ValueError(f"Missing invoice {self.att(ke)}")
+
+    def __set_unit_cost(self, invoice):
+        try:
+            self.invoice_unit_cost = float(invoice["unit_cost"])
+        except ValueError as ve:
+            raise ValueError(f"Invalid unit cost: '{invoice['unit_cost']}'")            
 
     def att(self, error):
         return error.args[0].replace("_", " ")
