@@ -6,28 +6,27 @@ from details import Details
 import pytest
 import sys
 
+TEST_DATA_DIR = "test/data"
+JPG_LOGO = f"{TEST_DATA_DIR}/smp.jpg"
+PNG_LOGO = f"{TEST_DATA_DIR}/smp.png"
+DETAILS_FILE = f"{TEST_DATA_DIR}/details.json"
+ITEMS_FILE = f"{TEST_DATA_DIR}/items.csv"
+
 """
 parse_args tests
 """
 
 
 def test_parse_args(monkeypatch, capsys):
-    assert_valid_logo(monkeypatch, "test_data/smp.jpg")
-    assert_valid_logo(monkeypatch, "test_data/smp.png")
+    assert_valid_logo(monkeypatch, JPG_LOGO)
+    assert_valid_logo(monkeypatch, PNG_LOGO)
 
 
 def assert_valid_logo(monkeypatch, image_file):
     monkeypatch.setattr(
         sys,
         "argv",
-        [
-            "project.py",
-            "-d" "test_data/details.json",
-            "-i",
-            "test_data/items.csv",
-            "-l",
-            image_file,
-        ],
+        ["project.py", "-d", DETAILS_FILE, "-i", ITEMS_FILE, "-l", image_file],
     )
     logo, _, _ = parse_args()
     assert logo == image_file
@@ -43,7 +42,7 @@ def test_parse_args_details_required(capsys):
 
 
 def test_parse_args_items_required(monkeypatch, capsys):
-    monkeypatch.setattr(sys, "argv", ["project.py", "-d" "test_data/details.json"])
+    monkeypatch.setattr(sys, "argv", ["project.py", f"-d {DETAILS_FILE}"])
     with pytest.raises(SystemExit) as pytest_error:
         parse_args()
 
@@ -56,18 +55,18 @@ def test_parse_args_logo_optional(monkeypatch):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["project.py", "-d" "test_data/details.json", "-i", "test_data/items.csv"],
+        ["project.py", "-d", DETAILS_FILE, "-i", ITEMS_FILE],
     )
     logo, details, items = parse_args()
-    assert details == "test_data/details.json"
-    assert items == "test_data/items.csv"
+    assert details == DETAILS_FILE
+    assert items == ITEMS_FILE
 
 
 def test_parse_args_logo_missing(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["project.py", "-d" "test_data/details.json", "-i", "items.csv", "-l", "bad"],
+        ["project.py", "-d", DETAILS_FILE, "-i", ITEMS_FILE, "-l", "bad"],
     )
     with pytest.raises(SystemExit) as pytest_error:
         parse_args()
@@ -81,14 +80,7 @@ def test_parse_args_logo_invalid(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        [
-            "project.py",
-            "-d" "test_data/details.json",
-            "-i",
-            "items.csv",
-            "-l",
-            "project.py",
-        ],
+        ["project.py", "-d", DETAILS_FILE, "-i", ITEMS_FILE, "-l", "project.py"],
     )
     with pytest.raises(SystemExit) as pytest_error:
         parse_args()
@@ -102,7 +94,7 @@ def test_parse_args_details_file_missing(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["project.py", "-d" "missing.json", "-i", "test_data/items.csv"],
+        ["project.py", "-d" "missing.json", "-i", ITEMS_FILE],
     )
     with pytest.raises(SystemExit) as pytest_error:
         parse_args()
@@ -116,7 +108,7 @@ def test_parse_args_items_file_missing(monkeypatch, capsys):
     monkeypatch.setattr(
         sys,
         "argv",
-        ["project.py", "-d" "test_data/details.json", "-i", "missing.csv"],
+        ["project.py", "-d", DETAILS_FILE, "-i", "missing.csv"],
     )
     with pytest.raises(SystemExit) as pytest_error:
         parse_args()
@@ -132,7 +124,7 @@ load_details tests
 
 
 def test_load_details():
-    details = load_details("test_data/details.json")
+    details = load_details(DETAILS_FILE)
     assert details.company_name == "Mario's Plumbing Co"
     assert details.company_street == "Mario Bros. House"
     assert details.company_city == "Toad Town"
@@ -223,7 +215,7 @@ load_items tests
 
 
 def test_load_items():
-    items = load_items("test_data/items.csv")
+    items = load_items(ITEMS_FILE)
     assert len(items) == 5
     assert "Feb 05, 2024" == items[1].date
     assert 3.0 == items[1].hours
@@ -269,9 +261,7 @@ create_invoice tests
 
 
 def test_create_invoice():
-    invoice = create_invoice(
-        "test_data/smp.png", "test_data/details.json", "test_data/items.csv"
-    )
+    invoice = create_invoice(PNG_LOGO, DETAILS_FILE, ITEMS_FILE)
     assert invoice.issuer == "Mario's Plumbing Co"
     assert invoice.contact[0] == "Mario Bros. House"
     assert invoice.contact[1] == "Toad Town, Mushroom Kingdom, 12345"
@@ -310,7 +300,7 @@ def assert_missing_details(capsys, att, error):
 
 
 def load_test_details(excluding):
-    with open("test_data/details.json") as file:
+    with open(DETAILS_FILE) as file:
         data = json.load(file)
 
     atts = excluding.split(".")
@@ -332,7 +322,7 @@ def assert_incomplete_item(capsys, att, error):
 
 def load_test_items(excluding=""):
     data = []
-    with open("test_data/items.csv") as file:
+    with open(ITEMS_FILE) as file:
         reader = csv.DictReader(file)
         for row in reader:
             del row[excluding]
