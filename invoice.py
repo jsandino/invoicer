@@ -197,17 +197,12 @@ class Invoice(FPDF):
         top = -40
 
         self.set_font("CourierPrimeBold", "B", 12)
-        self.set_x(-45)
-        self.cell(30, top, self.invoice_number)
+        self.set_x(-44)
+        self.cell(30, top, self.invoice_number, align="R")
 
         self.set_font("CourierPrime", "", 10)
-        x_pos = self.__right_margin(self.date)
-        self.set_x(x_pos)
-        self.cell(30, top + 12, self.date)
-
-    def __right_margin(self, text):
-        width = self.get_string_width(text)
-        return 210 - width - 14.5
+        self.set_x(-44)
+        self.cell(30, top + 12, self.date, align="R")
 
     def add_summary(self):
         self.ln(Invoice.SECTION_SPACING)
