@@ -116,15 +116,19 @@ class Invoice(FPDF):
 
     @property
     def tax_label(self):
-        return f"{self.__tax_label}:"
+        return f"{self.__tax_label}:" if self.__tax_label else ""
 
     @property
     def tax_rate(self):
-        return self.__tax_rate
+        return self.__tax_rate if self.__tax_rate else 0
 
     @property
     def tax_amount(self):
         return round(self.total_cost * self.tax_rate, 2)
+    
+    @property
+    def tax_amount_label(self):
+        return f"${self.tax_amount:6,.2f}" if self.tax_amount else ""
 
     @property
     def amount_due(self):
@@ -245,7 +249,7 @@ class Invoice(FPDF):
             ["", "", "", ""],
             ["", "", "", ""],
             ["", "", "Subtotal:", f"${self.total_cost:6,.2f}"],
-            ["", "", self.tax_label, f"${self.tax_amount:6,.2f}"],
+            ["", "", self.tax_label, self.tax_amount_label],
         ]
 
     def add_terms_info(self):
